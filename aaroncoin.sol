@@ -1,8 +1,9 @@
 pragma solidity 0.7.6;
 
 import "./safemath.sol";
+import "./ownable.sol";
 
-contract AaronCoin{
+contract AaronCoin is Ownable{
     
     using SafeMath for uint;
     
@@ -90,5 +91,15 @@ contract AaronCoin{
         accounts[msg.sender].balance = accounts[msg.sender].balance.add(rand);
         accounts[msg.sender].readyTime = block.timestamp + accounts[msg.sender].coolTime;
         accounts[msg.sender].coolTime = accounts[msg.sender].coolTime.mul(coolTimeIncreaseRate);
+        emit Transfer(address(0), msg.sender, rand);
     }
+    function showContractBalance() public view onlyOwner returns(uint){
+        return address(this).balance;
+    }
+    function withdraw() external onlyOwner {
+        address payable _owner = address(uint160(owner()));
+        _owner.transfer(address(this).balance);
+        emit Transfer(address(this), msg.sender, address(this).balance);
+    }
+
 }
